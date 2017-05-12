@@ -1,6 +1,9 @@
 package workerpool
 
-import "sync"
+import (
+	"sync"
+	"runtime"
+)
 
 type Worker interface {
 	Run()
@@ -9,6 +12,10 @@ type Worker interface {
 type Pool struct {
 	tasks chan Worker
 	wg    sync.WaitGroup
+}
+func NewDefault() *Pool {
+	numCPUs := runtime.NumCPU()
+	return New(numCPUs)
 }
 
 func New(maxSize int) *Pool {

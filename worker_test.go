@@ -15,10 +15,24 @@ func (s *simpleTask) Run() {
   time.Sleep(time.Second)
 }
 
-func TestHello(t *testing.T) {
-	t.Log("Hello Test")
+func TestNew(t *testing.T) {
+	t.Log("Hello New")
   {
     pool := New(3)
+    names := []string {"a", "aa", "aaa", "bbb"}
+    for _, name := range names {
+      np := simpleTask{
+        name: name,
+      }
+      pool.Submit(&np)
+    }
+  }
+}
+
+func TestNewDefault(t *testing.T) {
+	t.Log("Hello New")
+  {
+    pool := NewDefault()
     names := []string {"a", "aa", "aaa", "bbb"}
     for _, name := range names {
       np := simpleTask{
