@@ -13,9 +13,10 @@ type Pool struct {
 	tasks chan Worker
 	wg    sync.WaitGroup
 }
+
 func NewDefault() *Pool {
 	numCPUs := runtime.NumCPU()
-	return New(numCPUs)
+	return New(numCPUs * 2)
 }
 
 func New(maxSize int) *Pool {
