@@ -13,8 +13,9 @@ type Worker interface {
 
 type Pool struct {
 	tasks chan Worker
-	wg    sync.WaitGroup
-	waitTaskWg *sync.WaitGroup
+	sizeWg    sync.WaitGroup
+	waitTaskWg sync.WaitGroup
+	waitTaskNum int
 }
 
 func NewDefault(waitNum int) *Pool {
@@ -29,15 +30,18 @@ func NewDefault(waitNum int) *Pool {
 func New(maxSize int, waitNum int) *Pool {
 	pool := Pool{
 		tasks: make(chan Worker),
+		waitTaskNum: waitNum,
 	}
-	pool.setWaitTaskNum(waitNum)
-	pool.wg.Add(maxSize)
+	if (waitNum > 0) {
+		pool.waitTaskWg.Add(waitNum)
+	}
+	pool.sizeWg.Add(maxSize)
 	for i := 0; i < maxSize; i++ {
 		go func() {
 			for t := range pool.tasks {
 				t.Run()
 			}
-			pool.wg.Done()
+			pool.sizeWg.Done()
 		}()
 	}
 
@@ -46,26 +50,25 @@ func New(maxSize int, waitNum int) *Pool {
 
 func (pool *Pool) setWaitTaskNum(size int) {
 	if (size > 0) {
-		pool.waitTaskWg = new(sync.WaitGroup)
-		pool.waitTaskWg.Add(size)
+
 	}
 }
 
 func (pool *Pool) Submit(w Worker) {
-	if (pool.waitTaskWg != nil) {
+	if (pool.waitTaskNum > 0) {
 		pool.waitTaskWg.Done()
 	}
 	pool.tasks <- w
 }
 
 func (pool *Pool) Shutdown() (err error) {
-	if (pool.waitTaskWg != nil) {
-		if waitTimeout(pool.waitTaskWg, 3 * time.Second) {
+	if (pool.waitTaskNum > 0) {
+		if waitTimeout(&pool.waitTaskWg, 10 * time.Second) {
 			err =  errors.New("Timed out waiting for wait group")
 		}
 	}
 	close(pool.tasks)
-	pool.wg.Wait()
+	pool.sizeWg.Wait()
 	return
 }
 

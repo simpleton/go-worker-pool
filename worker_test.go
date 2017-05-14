@@ -33,7 +33,7 @@ func TestNew(t *testing.T) {
 func TestNewDefault(t *testing.T) {
 	t.Log("Hello New")
   {
-    pool := NewDefault(4)
+    pool := NewDefault(5)
     names := []string {"a", "aa", "aaa", "bbb"}
     for _, name := range names {
       np := simpleTask{
