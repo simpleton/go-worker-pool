@@ -18,7 +18,7 @@ func (s *simpleTask) Run() {
 func TestNew(t *testing.T) {
 	t.Log("Hello New")
   {
-    pool := New(3, 5)
+    pool := New(3, 4)
     names := []string {"a", "aa", "aaa", "bbb"}
     for _, name := range names {
       np := simpleTask{
@@ -33,7 +33,7 @@ func TestNew(t *testing.T) {
 func TestNewDefault(t *testing.T) {
 	t.Log("Hello New")
   {
-    pool := NewDefault(5)
+    pool := NewDefault(4)
     names := []string {"a", "aa", "aaa", "bbb"}
     for _, name := range names {
       np := simpleTask{
@@ -41,5 +41,6 @@ func TestNewDefault(t *testing.T) {
       }
       pool.Submit(&np)
     }
+    pool.Shutdown()
   }
 }

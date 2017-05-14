@@ -48,23 +48,17 @@ func New(maxSize int, waitNum int) *Pool {
 	return &pool
 }
 
-func (pool *Pool) setWaitTaskNum(size int) {
-	if (size > 0) {
-
-	}
-}
-
 func (pool *Pool) Submit(w Worker) {
+	pool.tasks <- w
 	if (pool.waitTaskNum > 0) {
 		pool.waitTaskWg.Done()
 	}
-	pool.tasks <- w
 }
 
 func (pool *Pool) Shutdown() (err error) {
 	if (pool.waitTaskNum > 0) {
 		if waitTimeout(&pool.waitTaskWg, 10 * time.Second) {
-			err =  errors.New("Timed out waiting for wait group")
+			err =  errors.New("Timed out waiting for sync.WaitGroup")
 		}
 	}
 	close(pool.tasks)
